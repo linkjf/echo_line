@@ -1,0 +1,42 @@
+# macOS
+.DS_Store
+
+# Android Studio / IntelliJ user state
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Local SDK and machine-specific Gradle settings
+local.properties
+/local.properties
+
+# Gradle
+.gradle/
+/build/
+**/build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# Kotlin
+.kotlin/
+
+# Android generated output
+/captures/
+.externalNativeBuild/
+.cxx/
+*.apk
+*.ap_
+*.aab
+*.dex
+
+# Native crash/build symbols
+*.hprof
+
+# Signing material and secrets
+*.jks
+*.keystore
+keystore.properties
+secrets.properties
+
+# Logs
+*.log
