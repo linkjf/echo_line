@@ -1,5 +1,6 @@
 package com.linkjf.echoline
 
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -54,7 +55,7 @@ class EchoViewModelTest {
     fun validInputCanSubmit() {
         val viewModel = EchoViewModel(repository = RecordingEchoRepository(result = true))
 
-        viewModel.onInputChanged("Hello Joist")
+        viewModel.onInputChanged("Hello EchoLine")
 
         val state = viewModel.uiState.value
         assertNull(state.inputError)
@@ -80,14 +81,32 @@ class EchoViewModelTest {
     fun submitSuccessDisplaysSubmittedText() = runTest {
         val viewModel = EchoViewModel(repository = RecordingEchoRepository(result = true))
 
-        viewModel.onInputChanged("Hello Joist")
+        viewModel.onInputChanged("Hello EchoLine")
         viewModel.onSubmit()
         testDispatcher.scheduler.advanceUntilIdle()
 
         val state = viewModel.uiState.value
-        assertEquals("Hello Joist", state.submittedText)
+        assertEquals("Hello EchoLine", state.submittedText)
         assertNull(state.errorMessage)
         assertFalse(state.isSubmitting)
+    }
+
+    @Test
+    fun submitWhileAlreadySubmittingDoesNotCallRepositoryAgain() = runTest {
+        val repository = PendingEchoRepository()
+        val viewModel = EchoViewModel(repository = repository)
+
+        viewModel.onInputChanged("Hello EchoLine")
+        viewModel.onSubmit()
+        testDispatcher.scheduler.runCurrent()
+        viewModel.onSubmit()
+
+        assertEquals(1, repository.callCount)
+
+        repository.complete(result = true)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        assertEquals(1, repository.callCount)
     }
 
     @Test
@@ -105,12 +124,28 @@ class EchoViewModelTest {
     }
 
     private class RecordingEchoRepository(private val result: Boolean) : EchoRepository {
-        var wasCalled = false
+        var callCount = 0
+        val wasCalled: Boolean
+            get() = callCount > 0
+
+        override suspend fun validate(text: String): Boolean {
+            callCount += 1
+            return result
+        }
+    }
+
+    private class PendingEchoRepository : EchoRepository {
+        private val result = CompletableDeferred<Boolean>()
+        var callCount = 0
             private set
 
         override suspend fun validate(text: String): Boolean {
-            wasCalled = true
-            return result
+            callCount += 1
+            return result.await()
+        }
+
+        fun complete(result: Boolean) {
+            this.result.complete(result)
         }
     }
 }

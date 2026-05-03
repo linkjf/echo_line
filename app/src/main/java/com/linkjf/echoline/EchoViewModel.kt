@@ -26,6 +26,10 @@ class EchoViewModel(
     }
 
     fun onSubmit() {
+        if (uiState.value.isSubmitting) {
+            return
+        }
+
         val submittedText = uiState.value.inputText.trim()
         val inputError = localTextValidator.validate(submittedText)
 
