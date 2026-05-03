@@ -1,3 +1,13 @@
 <resources>
     <string name="app_name">EchoLine</string>
+    <string name="echo_title">EchoLine</string>
+    <string name="echo_subtitle">Enter text, validate it, and echo it back.</string>
+    <string name="echo_input_label">Text to echo</string>
+    <string name="echo_submit">Submit</string>
+    <string name="echo_validating">Validating</string>
+    <string name="echo_output_label">Echoed text</string>
+    <string name="error_empty_input">Enter some text to echo.</string>
+    <string name="error_minimum_length">Enter at least %1$d characters.</string>
+    <string name="error_unsupported_characters">Text contains unsupported characters.</string>
+    <string name="error_server_validation_failed">Server validation failed. Try different text.</string>
 </resources>
